@@ -7,5 +7,4 @@ resources:
   - pvc.yaml
   - service.yaml
   - ingressroute.yaml
-  - sealed-secret-pihole-webpassword-2.yaml
   - sealed-secret-pihole-webpassword.yaml
