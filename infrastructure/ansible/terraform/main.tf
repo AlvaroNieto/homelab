@@ -9,7 +9,7 @@ terraform {
 
 provider "proxmox" {
   endpoint  = var.proxmox_api_url
-  insecure = true
+  insecure  = true
   api_token = var.proxmox_apikey
 }
 
@@ -19,14 +19,14 @@ resource "proxmox_virtual_environment_vm" "ansible" {
   name      = "ansible"
   node_name = "pr0"
 
-  vm_id     = 1100
+  vm_id = 1100
   clone {
     vm_id = var.template_id
     full  = true
   }
 
   cpu {
-    cores = 1
+    cores   = 1
     sockets = 1
     type    = "host"
   }
@@ -38,19 +38,19 @@ resource "proxmox_virtual_environment_vm" "ansible" {
 
   scsi_hardware = "virtio-scsi-pci"
   boot_order    = ["scsi0"]
-  
+
   network_device {
     bridge = var.network_bridge
     model  = "virtio"
   }
 
   initialization {
-    vendor_data_file_id  = "local:snippets/vendor.yaml" 
-    datastore_id = var.storage_pool
-    interface    = "scsi1"
+    vendor_data_file_id = "local:snippets/vendor.yaml"
+    datastore_id        = var.storage_pool
+    interface           = "scsi1"
     ip_config {
       ipv4 {
-        address = "10.1.1.201/24"  # Manual IP
+        address = "10.1.1.201/24" # Manual IP
         gateway = "10.1.1.1"
       }
     }
@@ -59,7 +59,7 @@ resource "proxmox_virtual_environment_vm" "ansible" {
     }
   }
 
-    agent {
+  agent {
     enabled = true
   }
 }

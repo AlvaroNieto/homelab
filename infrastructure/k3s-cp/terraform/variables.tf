@@ -37,7 +37,7 @@ variable "gateway" {
 }
 
 variable "target_nodes" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "storage_pool" {
