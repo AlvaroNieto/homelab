@@ -14,14 +14,9 @@ variable "proxmox_node" {
   type        = string
 }
 
-variable "template_id_node0" {
+variable "template_id" {
   type    = string
   default = "8001" # ID Ubuntu 24.04 cloud-init template
-}
-
-variable "template_id_node1" {
-  type    = string
-  default = "8002" # ID Ubuntu 24.04 cloud-init template
 }
 
 variable "network_bridge" {
@@ -37,7 +32,7 @@ variable "gateway" {
 }
 
 variable "target_nodes" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "storage_pool" {

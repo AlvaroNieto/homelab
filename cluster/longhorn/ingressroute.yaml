@@ -8,11 +8,11 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   entryPoints:
-  - web
+    - web
   routes:
-  - match: Host(`longhorn.alvaronl.com`)
-    kind: Rule
-    priority: 10
-    services:
-    - name: longhorn-frontend
-      port: 80
+    - match: Host(`longhorn.alvaronl.com`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: longhorn-frontend
+          port: 80

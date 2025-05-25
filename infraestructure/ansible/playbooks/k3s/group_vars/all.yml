@@ -1,4 +1,0 @@
-k3s_version: v1.32.4+k3s1
-k3s_user: alvaro
-k3s_token: "" # This is going to be set via fact
-k3s_server_ip: 10.1.1.101
