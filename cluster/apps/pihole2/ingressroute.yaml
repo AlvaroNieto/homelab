@@ -8,11 +8,11 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   entryPoints:
-  - web
+    - web
   routes:
-  - match: Host(`pihole2.alvaronl.com`)
-    kind: Rule
-    priority: 10
-    services:
-    - name: http
-      port: 80
+    - match: Host(`pihole2.alvaronl.com`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: http
+          port: 80
