@@ -1,7 +1,6 @@
+---
 name: CI - Validate Kubernetes and Bash
-
-
-#Validacion para push en pre, en main y PRs hacia Main.
+# Validacion para push en pre, en main y PRs hacia Main.
 on:
   pull_request:
     branches: [main]
@@ -22,20 +21,32 @@ jobs:
           sudo apt-get install -y yamllint shellcheck
 
           # Install kustomize
-          curl -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.0.1/kustomize_v5.0.1_linux_amd64.tar.gz -o kustomize.tar.gz
+          curl -L \
+            https://github.com/kubernetes-sigs/\
+            kustomize/releases/download/\
+            kustomize%2Fv5.0.1/kustomize_v5.0.1_linux_amd64.tar.gz \
+            -o kustomize.tar.gz
           tar -xzf kustomize.tar.gz
           sudo mv kustomize /usr/local/bin/
 
           # Install kubeconform
-          curl -L https://github.com/yannh/kubeconform/releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
+          curl -L \
+            https://github.com/yannh/kubeconform/\
+            releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz \
+            -o kubeconform.tar.gz
           tar -xzf kubeconform.tar.gz
           sudo mv kubeconform /usr/local/bin/
 
-          # Install terraform 
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt-get update && sudo apt-get install -y terraform
-
+          # Install terraform
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+            sudo gpg --dearmor -o /usr/share/keyrings/\
+            hashicorp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/\
+          hashicorp-archive-keyring.gpg] \
+            https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+            sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt-get update
+          sudo apt-get install -y terraform
 
       - name: Lint YAML files
         run: yamllint .
@@ -43,9 +54,11 @@ jobs:
       - name: Validate kustomize builds and Kubernetes manifests
         run: |
           set -euo pipefail
-          for dir in $(find . -name kustomization.yaml -exec dirname {} \; | sort -u); do
+          for dir in $(find . -name kustomization.yaml \
+          -exec dirname {} \; | sort -u); do
             echo "🔍 Validating $dir"
-            if ! kustomize build "$dir" | kubeconform -strict -summary -ignore-missing-schemas; then
+            if ! kustomize build "$dir" | kubeconform -strict -summary \
+            -ignore-missing-schemas; then
               echo "❌ Validation failed for $dir"
               exit 1
             fi
@@ -53,7 +66,8 @@ jobs:
 
       - name: Format check for Terraform files
         run: |
-          tf_dirs=$(find infrastructure -type f -path "*/terraform/*.tf" -exec dirname {} \; | sort -u)
+          tf_dirs=$(find infrastructure -type f -path "*/terraform/*.tf" \
+          -exec dirname {} \; | sort -u)
           for dir in $tf_dirs; do
             echo "🧹 terraform fmt check: $dir"
             terraform -chdir="$dir" fmt -check -diff
@@ -61,7 +75,8 @@ jobs:
 
       - name: Validate Terraform configuration
         run: |
-          for dir in $(find infrastructure -type f -path "*/terraform/*.tf" -exec dirname {} \; | sort -u); do
+          for dir in $(find infrastructure -type f -path "*/terraform/*.tf" \
+          -exec dirname {} \; | sort -u); do
             echo "🔍 terraform validate: $dir"
             terraform -chdir="$dir" init -backend=false
             terraform -chdir="$dir" validate
