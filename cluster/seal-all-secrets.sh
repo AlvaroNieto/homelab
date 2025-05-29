@@ -80,7 +80,8 @@ find "$BASE_PATH" -type f -name "secret.yaml" | while read -r secret_file; do
     kubeseal --cert "$SEALED_CERT_PATH" \
       --format yaml \
       --namespace "$namespace" \
-      < "$temp_doc_file" > "$sealed_file"
+      < "$temp_doc_file" \
+      | yq eval '(.spec.encryptedData // {}) |= with_entries(.value |= "\(.)\n" | .style = "folded")' -o=y > "$sealed_file"
 
     # Clean up the temporary file
     rm "$temp_doc_file"

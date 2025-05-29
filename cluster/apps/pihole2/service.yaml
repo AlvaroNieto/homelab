@@ -10,6 +10,7 @@ spec:
     app: pihole
   type: LoadBalancer
   loadBalancerIP: 10.1.1.30
+  externalTrafficPolicy: Local
   ports:
     - name: http
       protocol: TCP
