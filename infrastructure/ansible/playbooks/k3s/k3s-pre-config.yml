@@ -1,0 +1,79 @@
+---
+- name: Deploy Longhorn in the k3s preprod controlplane
+  hosts: k3s_preprod
+  become: true
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Updating, installing NFS and iSCSI dependencies
+      shell: |
+        apt update
+        apt install -y open-iscsi nfs-common
+        modprobe iscsi_tcp
+        echo "iscsi_tcp" | tee -a /etc/modules-load.d/iscsi.conf
+
+    - name: Wait for apt and dependencies to be installed
+      wait_for:
+        path: /etc/modules-load.d/iscsi.conf
+        state: present
+        timeout: 30
+
+    - name: Prepare and install Longhorn
+      shell: |
+        kubectl create namespace longhorn-system-preprod
+        kubectl apply -n longhorn-system-preprod -f \
+        https://raw.githubusercontent.com/longhorn/longhorn/v1.6.1/deploy/longhorn.yaml
+      run_once: true
+
+    - name: Wait for Longhorn to be deployed in the cluster
+      shell: |
+        kubectl -n longhorn-system get pods --no-headers | \
+        grep -v 'Running\|Completed'
+      register: longhorn_check
+      retries: 10
+      delay: 15
+      until: longhorn_check.stdout == ""
+      changed_when: false
+
+- name: Deploy ArgoCD
+  hosts: k3s_preprod
+  become: true
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Create ArgoCD namespace and apply manifest
+      shell: |
+        kubectl create namespace argocd-preprod
+        kubectl apply -n argocd-preprod -f \
+        https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+    - name: Wait for ArgoCD to be deployed in the cluster
+      shell: |
+        kubectl -n argocd-preprod get pods --no-headers | \
+        grep -v 'Running\|Completed'
+      register: argocd_check
+      retries: 10
+      delay: 15
+      until: argocd_check.stdout == ""
+      changed_when: false
+
+- name: Deploy SealedSecrets
+  hosts: k3s_preprod
+  become: true
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Apply SealedSecrets manifest
+      shell: |
+        kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/\
+        releases/download/v0.29.0/controller.yaml
+
+    - name: Wait for SealedSecrets to be deployed in the cluster
+      shell: |
+        kubectl get pods -n kube-system | grep sealed-secrets | \
+        grep -v 'Running\|Completed'
+      register: sealedsecrets_check
+      retries: 10
+      delay: 15
+      until: sealedsecrets_check.stdout == ""
+      changed_when: false
