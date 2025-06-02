@@ -26,7 +26,8 @@ jobs:
 
           # Detect modified files between base and actual commit
 
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          changed_files=$(git diff --name-only \
+          ${{ github.event.before }} ${{ github.sha }})
 
           echo "Changed files detected:"
           echo "$changed_files"
@@ -42,7 +43,7 @@ jobs:
               echo "CHANGED_SH=true" >> $GITHUB_ENV
             fi
           done
-      
+
       - name: Install yamllint and shellcheck
         if: env.CHANGED_YAML == 'true' || env.CHANGED_SH == 'true'
         run: |
@@ -52,22 +53,31 @@ jobs:
       - name: Install kustomize
         if: env.CHANGED_YAML == 'true'
         run: |
-          curl -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.0.1/kustomize_v5.0.1_linux_amd64.tar.gz -o kustomize.tar.gz
+          curl -L https://github.com/kubernetes-sigs/kustomize/\
+          releases/download/kustomize%2Fv5.0.1/\
+          kustomize_v5.0.1_linux_amd64.tar.gz -o kustomize.tar.gz
           tar -xzf kustomize.tar.gz
           sudo mv kustomize /usr/local/bin/
 
       - name: Install kubeconform
         if: env.CHANGED_YAML == 'true'
         run: |
-          curl -L https://github.com/yannh/kubeconform/releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
+          curl -L https://github.com/yannh/kubeconform/\
+          releases/download/v0.6.4/\
+          kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
           tar -xzf kubeconform.tar.gz
           sudo mv kubeconform /usr/local/bin/
 
       - name: Install terraform
         if: env.CHANGED_TF == 'true'
         run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+          sudo gpg --dearmor -o /usr/share/keyrings/\
+          hashicorp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/\
+          hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com \
+          $(lsb_release -cs) main" | \
+          sudo tee /etc/apt/sources.list.d/hashicorp.list
           sudo apt-get update
           sudo apt-get install -y terraform
 
