@@ -14,35 +14,80 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      # yamllint disable rule:line-length
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: changes
+        run: |
+          echo "CHANGED_YAML=false" >> $GITHUB_ENV
+          echo "CHANGED_TF=false" >> $GITHUB_ENV
+          echo "CHANGED_SH=false" >> $GITHUB_ENV
+
+          # Detect modified files between base and actual commit
+
+          changed_files=$(git diff --name-only \
+          ${{ github.event.before }} ${{ github.sha }})
+
+          echo "Changed files detected:"
+          echo "$changed_files"
+
+          for file in $changed_files; do
+            if [[ "$file" == *.yaml || "$file" == *.yml ]]; then
+              echo "CHANGED_YAML=true" >> $GITHUB_ENV
+            fi
+            if [[ "$file" == *.tf ]]; then
+              echo "CHANGED_TF=true" >> $GITHUB_ENV
+            fi
+            if [[ "$file" == *.sh ]]; then
+              echo "CHANGED_SH=true" >> $GITHUB_ENV
+            fi
+          done
+
       - name: Install yamllint and shellcheck
+        if: env.CHANGED_YAML == 'true' || env.CHANGED_SH == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y yamllint shellcheck
 
       - name: Install kustomize
+        if: env.CHANGED_YAML == 'true'
         run: |
-          curl -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.0.1/kustomize_v5.0.1_linux_amd64.tar.gz -o kustomize.tar.gz
+          curl -L https://github.com/kubernetes-sigs/kustomize/\
+          releases/download/kustomize%2Fv5.0.1/\
+          kustomize_v5.0.1_linux_amd64.tar.gz -o kustomize.tar.gz
           tar -xzf kustomize.tar.gz
           sudo mv kustomize /usr/local/bin/
 
       - name: Install kubeconform
+        if: env.CHANGED_YAML == 'true'
         run: |
-          curl -L https://github.com/yannh/kubeconform/releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
+          curl -L https://github.com/yannh/kubeconform/\
+          releases/download/v0.6.4/\
+          kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
           tar -xzf kubeconform.tar.gz
           sudo mv kubeconform /usr/local/bin/
 
       - name: Install terraform
+        if: env.CHANGED_TF == 'true'
         run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+          sudo gpg --dearmor -o /usr/share/keyrings/\
+          hashicorp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/\
+          hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com \
+          $(lsb_release -cs) main" | \
+          sudo tee /etc/apt/sources.list.d/hashicorp.list
           sudo apt-get update
           sudo apt-get install -y terraform
 
       - name: Lint YAML files
+        if: env.CHANGED_YAML == 'true'
+        # yamllint disable rule:line-length
         run: yamllint .
 
       - name: Validate kustomize builds and Kubernetes manifests
+        if: env.CHANGED_YAML == 'true'
         run: |
           set -euo pipefail
           for dir in $(find . -name kustomization.yaml -exec dirname {} \; | sort -u); do
@@ -54,6 +99,7 @@ jobs:
           done
 
       - name: Format check for Terraform files
+        if: env.CHANGED_TF == 'true'
         run: |
           tf_dirs=$(find infrastructure -type f -path "*/terraform/*.tf" -exec dirname {} \; | sort -u)
           for dir in $tf_dirs; do
@@ -62,6 +108,7 @@ jobs:
           done
 
       - name: Validate Terraform configuration
+        if: env.CHANGED_TF == 'true'
         run: |
           for dir in $(find infrastructure -type f -path "*/terraform/*.tf" -exec dirname {} \; | sort -u); do
             echo "🔍 terraform validate: $dir"
@@ -70,5 +117,6 @@ jobs:
           done
 
       - name: Lint Bash scripts
+        if: env.CHANGED_SH == 'true'
         run: |
           find . -type f -name "*.sh" -exec shellcheck {} \;
