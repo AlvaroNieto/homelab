@@ -65,23 +65,3 @@ resource "proxmox_virtual_environment_vm" "k3s_node0" {
     enabled = true
   }
 }
-
-  initialization {
-    vendor_data_file_id = "local:snippets/vendor.yaml"
-    datastore_id        = var.storage_pool
-    interface           = "scsi1"
-    ip_config {
-      ipv4 {
-        address = "10.1.1.99/24" # Manual IP
-        gateway = "10.1.1.1"
-      }
-    }
-    user_account {
-      username = "alvaro"
-    }
-  }
-
-  agent {
-    enabled = true
-  }
-}
