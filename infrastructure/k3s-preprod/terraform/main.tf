@@ -28,7 +28,7 @@ resource "proxmox_virtual_environment_vm" "k3s_node0" {
   }
 
   cpu {
-    cores   = 1
+    cores   = 2
     sockets = 1
     type    = "host"
   }
