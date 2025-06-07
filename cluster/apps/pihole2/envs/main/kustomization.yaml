@@ -1,12 +1,13 @@
+---
 resources:
-- ../../base
-- sealed-secret-pihole-webpassword.yaml
+  - ../../base
+  - sealed-secret-pihole-webpassword.yaml
 
 namespace: pihole2-main
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 patches:
-- path: patch-ingressroute.yaml
-- path: patch-deployment.yaml
-- path: patch-service.yaml
+  - path: patch-ingressroute.yaml
+  - path: patch-deployment.yaml
+  - path: patch-service.yaml
