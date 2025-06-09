@@ -1,6 +1,8 @@
 Añadir cluster externo a ArgoCD
 
-KUBECONFIG=/root/.kube/pre argocd cluster add default --grpc-web
+argocd login argocd.alvaronl.com --username admin --grpc-web
+KUBECONFIG=/root/.kube/pre 
+argocd cluster add default --grpc-web
 
 Get pass
 
