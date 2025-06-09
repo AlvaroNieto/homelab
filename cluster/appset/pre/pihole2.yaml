@@ -21,9 +21,9 @@ spec:
         targetRevision: pre
         path: cluster/apps/pihole2/envs/pre
       destination:
-        namespace: pihole-pre
+        namespace: pihole2-pre
         server: https://10.1.1.99:6443
       syncPolicy:
         automated: {}
         syncOptions:
-        - CreateNamespace=true
+          - CreateNamespace=true
