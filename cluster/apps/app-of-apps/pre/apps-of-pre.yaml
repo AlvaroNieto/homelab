@@ -1,0 +1,17 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-of-pre
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AlvaroNieto/homelab
+    targetRevision: pre
+    path: cluster/appset
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated: {}

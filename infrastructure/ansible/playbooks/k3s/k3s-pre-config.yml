@@ -20,15 +20,15 @@
 
     - name: Prepare and install Longhorn
       shell: |
-        kubectl create namespace longhorn-system-preprod
-        kubectl apply -n longhorn-system-preprod -f \
+        kubectl create namespace longhorn-system
+        kubectl apply -n longhorn-system -f \
         https://raw.githubusercontent.com/longhorn/longhorn/v1.6.1/deploy/longhorn.yaml
       run_once: true
 
     - name: Wait for Longhorn to be deployed in the cluster
       shell: |
         kubectl -n longhorn-system get pods --no-headers | \
-        grep -v 'Running\|Completed'
+        grep -v 'Running\|Completed' || true
       register: longhorn_check
       retries: 10
       delay: 15
@@ -50,7 +50,7 @@
     - name: Wait for ArgoCD to be deployed in the cluster
       shell: |
         kubectl -n argocd-preprod get pods --no-headers | \
-        grep -v 'Running\|Completed'
+        grep -v 'Running\|Completed' || true
       register: argocd_check
       retries: 10
       delay: 15
@@ -71,7 +71,7 @@
     - name: Wait for SealedSecrets to be deployed in the cluster
       shell: |
         kubectl get pods -n kube-system | grep sealed-secrets | \
-        grep -v 'Running\|Completed'
+        grep -v 'Running\|Completed' || true
       register: sealedsecrets_check
       retries: 10
       delay: 15

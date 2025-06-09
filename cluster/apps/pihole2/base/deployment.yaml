@@ -3,11 +3,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pihole
-  namespace: pihole2
   labels:
     app: pihole
 spec:
-  replicas: 1
+  replicas: 1   # Valor por defecto (override con patch)
   selector:
     matchLabels:
       app: pihole
@@ -18,7 +17,7 @@ spec:
     spec:
       containers:
         - name: pihole
-          image: 'pihole/pihole:latest'
+          image: "pihole/pihole:2025.05.1"
           ports:
             - containerPort: 80
           env:
@@ -30,7 +29,7 @@ spec:
                   key: password
                   name: pihole-webpassword
             - name: FTLCONF_dns_upstreams
-              value: 8.8.8.8;8.8.4.4
+              value: 8.8.8.8;1.1.1.1
           volumeMounts:
             - name: pihole-data
               mountPath: /etc/pihole

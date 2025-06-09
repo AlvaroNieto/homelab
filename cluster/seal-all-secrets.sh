@@ -92,5 +92,5 @@ echo "✅ All plaintext secrets have been sealed (but still exist locally)."
 echo "Commit ONLY the sealed-secret-*.yaml files, never the original secret.yaml files."
 
 # Call the script to append sealed secrets to kustomization.yaml files
-echo "📦 Adding sealed-secret files to kustomization.yaml manifests..."
-bash "$(dirname "$0")/append-sealed-secrets.sh"
+# echo "📦 Adding sealed-secret files to kustomization.yaml manifests..."
+# bash "$(dirname "$0")/append-sealed-secrets.sh"
