@@ -1,0 +1,27 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: pihole2-main
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/AlvaroNieto/homelab
+        revision: main
+        directories:
+          - path: cluster/apps/pihole2/envs/main
+  template:
+    metadata:
+      name: main-pihole2
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/AlvaroNieto/homelab
+        targetRevision: main
+        path: cluster/apps/pihole2/envs/main
+      destination:
+        namespace: pihole-main
+        server: https://kubernetes.default.svc
+      syncPolicy:
+        automated: {}
