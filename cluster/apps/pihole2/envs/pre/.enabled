@@ -1,5 +1,0 @@
-{
-  "environment": "pre",
-  "clusterServer": "https://10.1.1.99:6443",
-  "appBasePath": "cluster/apps/pihole2/envs/pre"
-}
