@@ -4,4 +4,4 @@ kind: Service
 metadata:
   name: pihole
 spec:
-  loadBalancerIP: 10.1.1.31
+  loadBalancerIP: 10.1.1.30
