@@ -21,9 +21,9 @@ spec:
         targetRevision: main
         path: cluster/apps/pihole2/envs/main
       destination:
-        namespace: pihole-main
+        namespace: pihole2-main
         server: https://kubernetes.default.svc
       syncPolicy:
         automated: {}
         syncOptions:
-        - CreateNamespace=true
+          - CreateNamespace=true
